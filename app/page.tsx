@@ -1,101 +1,105 @@
-import Image from "next/image";
+"use client";
+import { useEffect, useState } from "react";
+
+import EmployeeTable from "./components/employee-table";
+import Department from "./components/department";
+import Employee from "./components/employee";
+
+import { useDepartments } from "@/hooks/use-department";
+import { useEmployee } from "@/hooks/use-employee";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const { departments, fetchDepartments } = useDepartments();
+  const { employees, fetchEmployees } = useEmployee();
+  const [filterName, setFilterName] = useState<string>("");
+  const [filterDepartment, setFilterDepartment] = useState<string>("");
+  const [filteredEmployees, setFilteredEmployees] = useState(employees);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const handleFilterChange = async () => {
+    try {
+      const queryParams = new URLSearchParams({
+        ...(filterName && { name: filterName }),
+        ...(filterDepartment && { departmentId: filterDepartment }),
+      }).toString();
+      const res = await fetch(`/api/employee?${queryParams}`);
+      const response = await res.json();
+      setFilteredEmployees(response);
+      // fetchEmployees(filteredEmployees);
+    } catch (error) {
+      console.error("Error filtering employees:", error);
+    }
+  };
+
+  useEffect(() => {
+    setFilteredEmployees(employees);
+  }, [employees]);
+
+  return (
+    <div className="max-w-[1200px] mx-auto p-8">
+      <div className="flex flex-col md:flex-row justify-center md:space-x-20 space-y-6 md:space-y-0 items-center md:items-stretch">
+        <Department onDepartmentCreated={fetchDepartments} />
+        <Employee
+          departments={departments}
+          onEmployeeCreated={fetchEmployees}
+        />
+      </div>
+      <div className="flex flex-col md:flex-row justify-center mt-6 space-y-6 md:space-y-0 md:space-x-4">
+        <div>
+          <Select
+            value={filterDepartment}
+            onValueChange={(value) => setFilterDepartment(value)}
+            // className="border rounded-md px-3 py-2"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <SelectTrigger
+              className={
+                departments.length === 0 ? "cursor-not-allowed opacity-50" : ""
+              }
+            >
+              <SelectValue placeholder="All Departments" />
+            </SelectTrigger>
+
+            <SelectContent>
+              {departments.map((department) => {
+                return (
+                  <SelectItem value={department.id} key={department.id}>
+                    {department.name}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+        <div className="relative w-full">
+          <span className="absolute inset-y-0 right-3 flex items-center text-gray-500">
+            <Search className="h-5 w-5" />
+          </span>
+          <Input
+            type="text"
+            placeholder="Search by name"
+            value={filterName}
+            onChange={(e) => setFilterName(e.target.value)}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        </div>
+        <Button onClick={handleFilterChange} variant="ghost">
+          Apply Filters
+        </Button>
+      </div>
+      <div className="mt-10">
+        <EmployeeTable
+          employees={filteredEmployees}
+          departments={departments}
+        />
+      </div>
     </div>
   );
 }
