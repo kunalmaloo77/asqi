@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface DepartmentProps {
   onDepartmentCreated: () => void; // Callback to notify parent
@@ -19,7 +19,6 @@ interface DepartmentProps {
 const Department = ({ onDepartmentCreated }: DepartmentProps) => {
   const [department, setDepartment] = useState("");
   const [description, setDescription] = useState("");
-  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,18 +34,16 @@ const Department = ({ onDepartmentCreated }: DepartmentProps) => {
         const departmentData = await res.json();
         setDepartment("");
         setDescription("");
-        toast({
-          title: "Department Created",
-          description: `The department ${departmentData.name} was created successfully.`,
-        });
+        toast.success(
+          `The department ${departmentData.name} was created successfully.`
+        );
         onDepartmentCreated();
       } else {
         throw new Error("Failed to create department");
       }
     } catch (error) {
       console.log(error);
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to create department.",
       });
     }

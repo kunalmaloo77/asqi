@@ -19,8 +19,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
+// import { useToast } from "@/hooks/use-toast";
 import { Department as DepartmentType } from "@/types";
+import { toast } from "sonner";
 
 interface EmployeeProps {
   departments: DepartmentType[];
@@ -34,14 +35,11 @@ const Employee = ({ departments, onEmployeeCreated }: EmployeeProps) => {
     undefined
   );
 
-  const { toast } = useToast();
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (!departmentId) {
-        toast({
-          title: "Error",
+        toast.error("Error", {
           description: "Please select a department.",
         });
         return;
@@ -59,18 +57,16 @@ const Employee = ({ departments, onEmployeeCreated }: EmployeeProps) => {
         setName("");
         setAddress("");
         setDepartmentId(undefined);
-        toast({
-          title: "Employee Created",
-          description: `The employee ${employeeData.name} was created successfully.`,
-        });
+        toast.success(
+          `The employee ${employeeData.name} was created successfully.`
+        );
         onEmployeeCreated();
       } else {
         throw new Error("Failed to create employee");
       }
     } catch (error) {
       console.error("Error creating employee:", error);
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to create employee. Please try again.",
       });
     }
