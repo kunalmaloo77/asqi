@@ -14,9 +14,10 @@ import { toast } from "sonner";
 
 interface DepartmentProps {
   onDepartmentCreated: () => void; // Callback to notify parent
+  isLoading: boolean;
 }
 
-const Department = ({ onDepartmentCreated }: DepartmentProps) => {
+const Department = ({ onDepartmentCreated, isLoading }: DepartmentProps) => {
   const [department, setDepartment] = useState("");
   const [description, setDescription] = useState("");
 
@@ -88,6 +89,7 @@ const Department = ({ onDepartmentCreated }: DepartmentProps) => {
               </div>
               <div className="flex justify-between">
                 <Button
+                  disabled={isLoading}
                   variant="outline"
                   type="button"
                   onClick={() => {
@@ -97,7 +99,9 @@ const Department = ({ onDepartmentCreated }: DepartmentProps) => {
                 >
                   Reset
                 </Button>
-                <Button type="submit">Add Department</Button>
+                <Button type="submit" disabled={isLoading}>
+                  Add Department
+                </Button>
               </div>
             </div>
           </form>

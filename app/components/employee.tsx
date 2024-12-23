@@ -26,9 +26,14 @@ import { toast } from "sonner";
 interface EmployeeProps {
   departments: DepartmentType[];
   onEmployeeCreated: () => void;
+  isLoading: boolean;
 }
 
-const Employee = ({ departments, onEmployeeCreated }: EmployeeProps) => {
+const Employee = ({
+  departments,
+  onEmployeeCreated,
+  isLoading,
+}: EmployeeProps) => {
   const [name, setName] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [departmentId, setDepartmentId] = useState<string | undefined>(
@@ -44,6 +49,7 @@ const Employee = ({ departments, onEmployeeCreated }: EmployeeProps) => {
         });
         return;
       }
+
       const res = await fetch("/api/employee", {
         method: "POST",
         headers: {
@@ -108,7 +114,7 @@ const Employee = ({ departments, onEmployeeCreated }: EmployeeProps) => {
               <div className="flex flex-col space-y-1.5">
                 <p>Select Department</p>
                 <Select
-                  disabled={departments.length === 0}
+                  disabled={departments.length === 0 || isLoading}
                   onValueChange={(value) => setDepartmentId(value)}
                   value={departmentId || ""}
                 >
@@ -135,6 +141,7 @@ const Employee = ({ departments, onEmployeeCreated }: EmployeeProps) => {
               <div className="flex justify-between">
                 <Button
                   variant="outline"
+                  disabled={isLoading}
                   onClick={() => {
                     setName("");
                     setAddress("");
@@ -143,7 +150,9 @@ const Employee = ({ departments, onEmployeeCreated }: EmployeeProps) => {
                 >
                   Reset
                 </Button>
-                <Button type="submit">Add Employee</Button>
+                <Button type="submit" disabled={isLoading}>
+                  Add Employee
+                </Button>
               </div>
             </div>
           </form>

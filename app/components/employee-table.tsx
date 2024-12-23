@@ -11,14 +11,27 @@ import {
   Department as DepartmentType,
   Employee as EmployeeType,
 } from "@/types";
+import { Loader2 } from "lucide-react";
 
 interface EmployeeProps {
   employees: EmployeeType[];
   departments: DepartmentType[];
+  isLoading?: boolean;
 }
 
-const EmployeeTable = ({ employees, departments }: EmployeeProps) => {
-  console.log({ employees });
+const EmployeeTable = ({
+  employees,
+  departments,
+  isLoading,
+}: EmployeeProps) => {
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <Loader2 className="animate-spin size-6 text-muted-foreground" />
+      </div>
+    );
+  }
+
   return (
     <div>
       <Table>

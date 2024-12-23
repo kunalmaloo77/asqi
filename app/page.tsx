@@ -19,8 +19,17 @@ import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
-  const { departments, fetchDepartments } = useDepartments();
-  const { employees, fetchEmployees } = useEmployee();
+  const {
+    departments,
+    fetchDepartments,
+    isLoading: isLoadingDepartments,
+  } = useDepartments();
+  const {
+    employees,
+    fetchEmployees,
+    isLoading: isLoadingEmployee,
+    setIsLoading: setIsLoadingEmployee,
+  } = useEmployee();
   const [filterName, setFilterName] = useState<string>("");
   const [filterDepartment, setFilterDepartment] = useState<string>("");
   const [filteredEmployees, setFilteredEmployees] = useState(employees);
@@ -31,9 +40,12 @@ export default function Home() {
         ...(filterName && { name: filterName }),
         ...(filterDepartment && { departmentId: filterDepartment }),
       }).toString();
+
       const res = await fetch(`/api/employee?${queryParams}`);
+      setIsLoadingEmployee(true);
       const response = await res.json();
       setFilteredEmployees(response);
+      setIsLoadingEmployee(false);
       // fetchEmployees(filteredEmployees);
     } catch (error) {
       console.error("Error filtering employees:", error);
@@ -47,10 +59,14 @@ export default function Home() {
   return (
     <div className="max-w-[1200px] mx-auto p-8">
       <div className="flex flex-col md:flex-row justify-center md:space-x-20 space-y-6 md:space-y-0 items-center md:items-stretch">
-        <Department onDepartmentCreated={fetchDepartments} />
+        <Department
+          onDepartmentCreated={fetchDepartments}
+          isLoading={isLoadingDepartments}
+        />
         <Employee
           departments={departments}
           onEmployeeCreated={fetchEmployees}
+          isLoading={isLoadingEmployee}
         />
       </div>
       <div className="flex flex-col md:flex-row justify-center mt-6 space-y-6 md:space-y-0 md:space-x-4">
@@ -98,6 +114,7 @@ export default function Home() {
         <EmployeeTable
           employees={filteredEmployees}
           departments={departments}
+          isLoading={isLoadingEmployee}
         />
       </div>
     </div>

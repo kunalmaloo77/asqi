@@ -28,5 +28,5 @@ export function useEmployee() {
     }
   };
 
-  return { employees, fetchEmployees, isLoading };
+  return { employees, fetchEmployees, isLoading, setIsLoading };
 }
