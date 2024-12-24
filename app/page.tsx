@@ -38,7 +38,10 @@ export default function Home() {
     try {
       const queryParams = new URLSearchParams({
         ...(filterName && { name: filterName }),
-        ...(filterDepartment && { departmentId: filterDepartment }),
+        ...(filterDepartment &&
+          filterDepartment !== "all" && {
+            departmentId: filterDepartment,
+          }),
       }).toString();
 
       const res = await fetch(`/api/employee?${queryParams}`);
@@ -92,6 +95,7 @@ export default function Home() {
                   </SelectItem>
                 );
               })}
+              <SelectItem value="all">All departments</SelectItem>
             </SelectContent>
           </Select>
         </div>
